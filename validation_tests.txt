@@ -1,0 +1,156 @@
+
+main function getting the files from the arguments, for each file:
+    A. pre-assembler process
+    B. first pass (including validation check)
+    C. second pass
+
+booklet validations rules pages 32-40
+
+---validation check---
+
+
+For each line:
+
+1. Max line length - 80 chars not included the \n speacial character: "Error! Line {line_num} is longer than 80 characters"
+
+2. if line has only whitespaces or \t or \n than move to next line
+
+3. if line has the ";" character in the first char of the line than move to next line
+
+4. is there a label ? check label validity
+
+5. is there a machine function ? 
+    is it jmp,bne,jsr?
+
+        check commas and whitespaces validity, check parameters validity
+
+    else check commas and whitespaces validity
+
+6. is there a machine instruction ? check commas and whitespaces validity
+    if it is .entry or .extern && there is a label produce a warning message
+
+
+machine functions:
+
+--All machine functions are Label-optional
+
+    first group - 2 operands functions:
+
+        mov -
+            a comma between the operands, doesn't matter how many spaces there are between the operands and the comma,
+            target operand can't be a number,
+            for example: mov A, r1
+
+        cmp - 
+            a comma between the operands, doesn't matter how many spaces there are between the operands and the comma,
+            for example: cmp A, r1
+
+        add -
+            a comma between the operands, doesn't matter how many spaces there are between the operands and the comma,
+            target operand can't be a number,
+            for example: add A, r1
+           
+        sub - 
+            a comma between the operands, doesn't matter how many spaces there are between the operands and the comma,
+            target operand can't be a number,
+            for example: sub A, r1
+
+        lea -
+            a comma between the operands, doesn't matter how many spaces there are between the operands and the comma,
+            target operand can't be a number,
+            for example: lea A, r1
+    
+    second group - 1 operand functions:
+
+        not - 
+            target operand can't be a number,
+            for example: not r1
+
+        clr - 
+            target operand can't be a number,
+            for example: clr r1
+
+        inc -
+            target operand can't be a number,
+            for example: inc r1
+
+        dec -
+            target operand can't be a number,
+            for example: dec r1
+
+        jmp -
+            target operand can't be a number,
+            can optionally get 2 paramaters in parenthesis,
+            for example: jmp LINE(#-6,r4)
+            for example: jmp LINE
+
+        bne -
+            target operand can't be a number,
+            can optionally get 2 paramaters in parenthesis,
+            for example: bne LINE(#-6,r4)
+            for example: bne LINE
+
+        red -
+            for example: red r1
+
+        prn -
+            for example: prn r1
+
+        jsr -
+            target operand can't be a number,
+            can optionally get 2 paramaters in parenthesis,
+            for example: jsr FUNC(#-6,r4)
+            for example: jsr FUNC
+
+    third group - no operand functions:
+
+        rts -
+            for example: rts
+
+        stop -
+            for example: stop
+
+machine instructions:
+
+--All machine instructions are Label-optional(however, if a label is at a .entry or .extern line, the program will send a warning)
+
+    .data -
+        numbers divided by commas, not important the amount of spaces between parameters and commas,
+        no comma before the first number and no comma after the last number,
+        for example: .data 7, -57 ,  +17  ,9    
+
+    .string -
+        one paramater, a legal string,
+        for example: .string "abcdef" 
+
+    .entry -
+        one paramater, a legal label name who is defined in the same file,
+        label in this line should produce a warning message,
+        for example: .entry A 
+
+    .extern -
+        one paramater, a legal label name who is defined in another file,
+        label in this line should produce a warning message,
+        for example: .extern A
+
+other:
+
+    Labels - 
+            max length 30 characters, 
+            first char a letter, than letters or numbers,
+            only in the start of a machine function line, or in a .data or .string line,
+            if the label is in the start of a .entry or .extern line, the program will send a warning message,
+            after a label there must be a : without spaces between those,
+            label names should not repeat,
+            label name can't be a  saved word of the assembly language,
+            label cant be defined as a .entry and a .extern in the same file,
+            label can be used before its decleration
+
+    Numbers - 
+            an optional +/- sign, if no sign specified the sign will be +,
+            must be in the 10 base,
+            no support for floating numbers, only integers,
+            numbers in machine functions and parameters get an additional # sign before the number itself
+
+    Strings -
+            the string is enclosed in ""
